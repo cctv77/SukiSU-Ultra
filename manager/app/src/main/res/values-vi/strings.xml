@@ -587,4 +587,6 @@
     <string name="no_active_manager">Trình quản lý đang không hoạt động</string>
     <string name="default_signature">SukiSU</string>
     <string name="home_zygisk_implement">Triển khai Zygisk</string>
+    <!-- 循环路径相关 -->
+    <!-- 循环路径功能描述 -->
 </resources>
