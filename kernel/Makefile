@@ -71,9 +71,9 @@ ccflags-y += -DKSU_VERSION_FULL=\"$(KSU_VERSION_FULL)\"
 
 # Checks hooks state
 ifeq ($(strip $(CONFIG_KSU_MANUAL_HOOK)),y)
-$(info -- KernelSU: Manually-patched hook.)
+$(info -- KernelSU: CONFIG_KSU_MANUAL_HOOK)
 else
-$(info -- KernelSU: Kernel-probe hook.)
+$(info -- KernelSU: CONFIG_KSU_KPROBES_HOOK)
 ccflags-y += -DCONFIG_KSU_KPROBES_HOOK
 endif
 
