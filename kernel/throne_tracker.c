@@ -12,6 +12,7 @@
 #include "manager.h"
 #include "throne_tracker.h"
 #include "kernel_compat.h"
+#include "dynamic_sign.h"
 
 uid_t ksu_manager_uid = KSU_INVALID_UID;
 
@@ -387,8 +388,10 @@ void ksu_track_throne()
 	struct uid_data *np;
 	struct uid_data *n;
 
-	// first, check if manager_uid exist!
+	// Check if any manager exists (traditional or dynamic)
 	bool manager_exist = false;
+	
+	// Check for traditional manager
 	list_for_each_entry (np, &uid_list, list) {
 		// if manager is installed in work profile, the uid in packages.list is still equals main profile
 		// don't delete it in this case!
@@ -397,9 +400,15 @@ void ksu_track_throne()
 			manager_exist = true;
 			break;
 		}
-		
-		if (ksu_is_any_manager(np->uid)) {
-			manager_exist = true;
+	}
+	
+	// Check for dynamic managers
+	if (!manager_exist && ksu_is_dynamic_sign_enabled()) {
+		list_for_each_entry (np, &uid_list, list) {
+			if (ksu_is_any_manager(np->uid)) {
+				manager_exist = true;
+				break;
+			}
 		}
 	}
 
@@ -407,16 +416,21 @@ void ksu_track_throne()
 		if (ksu_is_manager_uid_valid()) {
 			pr_info("manager is uninstalled, invalidate it!\n");
 			ksu_invalidate_manager_uid();
-			goto prune;
 		}
+		
 		pr_info("Searching manager...\n");
 		search_manager("/data/app", 2, &uid_list);
 		pr_info("Search manager finished\n");
+	} else {
+		// Always perform search when called from dynamic sign rescan
+		pr_info("Performing manager search (may be from dynamic sign rescan)\n");
+		search_manager("/data/app", 2, &uid_list);
+		pr_info("Manager search completed\n");
 	}
 	
-prune:
-	// then prune the allowlist
+	// Always prune the allowlist
 	ksu_prune_allowlist(is_uid_exist, &uid_list);
+	
 out:
 	// free uid_list
 	list_for_each_entry_safe (np, n, &uid_list, list) {
