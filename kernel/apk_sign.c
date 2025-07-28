@@ -489,18 +489,15 @@ static struct apk_sign_key {
 	unsigned size;
 	const char *sha256;
 } apk_sign_keys[] = {
-    {EXPECTED_SIZE_OFFICIAL, EXPECTED_HASH_OFFICIAL}, // Official
 	{EXPECTED_SIZE_SHIRKNEKO, EXPECTED_HASH_SHIRKNEKO}, // SukiSU
 	{EXPECTED_SIZE_OTHER, EXPECTED_HASH_OTHER}, // Dynamic Sign
+#ifdef CONFIG_KSU_MULTI_MANAGER_SUPPORT
+    {EXPECTED_SIZE_WEISHU, EXPECTED_HASH_WEISHU}, // Official
+    {EXPECTED_SIZE_5EC1CFF, EXPECTED_HASH_5EC1CFF}, // 5ec1cff/KernelSU
+    {EXPECTED_SIZE_RSUNTK, EXPECTED_HASH_RSUNTK}, // rsuntk/KernelSU
+    {EXPECTED_SIZE_NEKO, EXPECTED_HASH_NEKO}, // Neko/KernelSU
 #ifdef EXPECTED_SIZE
 	{EXPECTED_SIZE, EXPECTED_HASH}, // Custom
-#endif
-#ifdef CONFIG_KSU_MULTI_MANAGER_SUPPORT
-	{EXPECTED_SIZE_RSUNTK, EXPECTED_HASH_RSUNTK}, // RKSU
-	{EXPECTED_SIZE_NEKO, EXPECTED_HASH_NEKO}, // Neko/KernelSU
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
-	{EXPECTED_SIZE_5EC1CFF, EXPECTED_HASH_5EC1CFF}, // MKSU
-	{EXPECTED_SIZE_WEISHU, EXPECTED_HASH_WEISHU}, // KSU
 #endif
 #endif
 };
@@ -806,8 +803,8 @@ clean:
 		}
 		
 		if (check_multi_manager) {
-			// 1: ShirkNeko/SukiSU, 2: Dynamic Sign
-			if (matched_index == 1 || matched_index == 2) {
+			// 0: ShirkNeko/SukiSU, 1: Dynamic Sign
+			if (matched_index == 0 || matched_index == 1) {
 				pr_info("Multi-manager APK detected (dynamic_sign enabled): signature_index=%d\n", matched_index);
 				return 1;
 			}
