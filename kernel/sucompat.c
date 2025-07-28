@@ -28,11 +28,11 @@
 #define SU_PATH "/system/bin/su"
 #define SH_PATH "/system/bin/sh"
 
-extern void ksu_escape_to_root();
-
-static const char sh_path[] = "/system/bin/sh";
+static const char sh_path[] = SH_PATH;
 static const char ksud_path[] = KSUD_PATH;
 static const char su[] = SU_PATH;
+
+extern void ksu_escape_to_root();
 
 bool ksu_sucompat_hook_state __read_mostly = true;
 
@@ -57,7 +57,6 @@ static inline char __user *ksud_user_path(void)
 
 static inline bool __is_su_allowed(const void *ptr_to_check)
 {
-
 #ifndef CONFIG_KSU_KPROBES_HOOK
 	if (!ksu_sucompat_hook_state)
 		return false;
@@ -73,8 +72,7 @@ static inline bool __is_su_allowed(const void *ptr_to_check)
 
 	return true;
 }
-
-#define is_su_allowed(ptr)	(__is_su_allowed((const void *)ptr))
+#define is_su_allowed(ptr)	__is_su_allowed((const void *)ptr)
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0) && defined(CONFIG_KSU_SUSFS_SUS_SU)
 struct filename* susfs_ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags) {
@@ -99,8 +97,7 @@ static int ksu_sucompat_user_common(const char __user **filename_user,
 				const char *syscall_name,
 				const bool escalate)
 {
-
-char path[sizeof(su)]; // sizeof includes nullterm already!
+	char path[sizeof(su)]; // sizeof includes nullterm already!
 	if (ksu_strncpy_from_user_retry(path, *filename_user, sizeof(path)))
 		return 0;
 
@@ -168,7 +165,7 @@ int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
 				 int *__never_use_flags)
 {
 	struct filename *filename;
-	
+
 	if (!is_su_allowed(filename_ptr))
 		return 0;
 
