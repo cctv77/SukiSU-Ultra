@@ -131,8 +131,10 @@ static inline void susfs_on_post_fs_data(void) {
 
 static bool ksu_module_mounted = false;
 
+// selinux/rules.c
 extern int ksu_handle_sepolicy(unsigned long arg3, void __user *arg4);
 
+// sucompat.c
 bool ksu_su_compat_enabled = true;
 extern void ksu_sucompat_init();
 extern void ksu_sucompat_exit();
@@ -1072,7 +1074,7 @@ int ksu_handle_prctl(int option, unsigned long arg2, unsigned long arg3,
 		bool enabled = (arg3 != 0);
 		if (enabled == ksu_su_compat_enabled) {
 			pr_info("cmd enable su but no need to change.\n");
-			if (copy_to_user(result, &reply_ok, sizeof(reply_ok))) {// return the reply_ok directly
+			if (copy_to_user(result, &reply_ok, sizeof(reply_ok))) {
 				pr_err("prctl reply error, cmd: %lu\n", arg2);
 			}
 			return 0;
@@ -1140,8 +1142,8 @@ static void ksu_path_umount(const char *mnt, struct path *path, int flags)
 	int err = path_umount(path, flags);
 	pr_info("%s: path: %s ret: %d\n", __func__, mnt, err);
 }
+#define ksu_umount_mnt(mnt, path, flags)	(ksu_path_umount(mnt, path, flags))
 #else
-// TODO: Search a way to make this works without set_fs functions
 static void ksu_sys_umount(const char *mnt, int flags)
 {
 	char __user *usermnt = (char __user *)mnt;
@@ -1158,7 +1160,8 @@ static void ksu_sys_umount(const char *mnt, int flags)
 	set_fs(old_fs);
 	pr_info("%s: path: %s ret: %d \n", __func__, usermnt, ret);
 }
-#endif
+#define ksu_umount_mnt(mnt, __unused, flags)	(ksu_sys_umount(mnt, flags))
+#endif 
 
 #ifdef CONFIG_KSU_SUSFS_TRY_UMOUNT
 void ksu_try_umount(const char *mnt, bool check_mnt, int flags, uid_t uid)
@@ -1189,12 +1192,7 @@ static void try_umount(const char *mnt, bool check_mnt, int flags)
 		pr_info("susfs: umounting '%s' for uid: %d\n", mnt, uid);
 	}
 #endif
-
-#ifdef KSU_HAS_PATH_UMOUNT
-	ksu_path_umount(mnt, &path, flags);
-#else
-	ksu_sys_umount(mnt, flags);
-#endif
+	ksu_umount_mnt(mnt, &path, flags);
 }
 
 #ifdef CONFIG_KSU_SUSFS_TRY_UMOUNT
