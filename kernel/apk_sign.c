@@ -458,7 +458,7 @@ int ksu_get_active_managers(struct manager_list_info *info)
 
     if (ksu_manager_uid != KSU_INVALID_UID && count < 2) {
         info->managers[count].uid = ksu_manager_uid;
-        info->managers[count].signature_index = 1;
+        info->managers[count].signature_index = 0;
         count++;
     }
     
@@ -621,7 +621,7 @@ static int verify_signature_block(struct file *fp, u32 *size4, loff_t *pos, u32 
 	for (i = 0; i < ARRAY_SIZE(apk_sign_keys); i++) {
 		sign_key = apk_sign_keys[i];
 
-		if (i == 2) {
+		if (i == 1) { // Dynamic Sign indexing
 			unsigned long flags;
 			spin_lock_irqsave(&dynamic_sign_lock, flags);
 			if (dynamic_sign.is_set) {
