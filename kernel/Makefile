@@ -109,12 +109,15 @@ ifeq ($(shell grep -q "SEC_SELINUX_PORTING_COMMON" $(srctree)/security/selinux/a
 ccflags-y += -DSAMSUNG_SELINUX_PORTING
 endif
 
-ifndef KSU_EXPECTED_SIZE
-KSU_EXPECTED_SIZE := 0x35c
+# Custom Signs
+ifdef KSU_EXPECTED_SIZE
+ccflags-y += -DEXPECTED_SIZE=$(KSU_EXPECTED_SIZE)
+$(info -- Custom KernelSU Manager signature size: $(KSU_EXPECTED_SIZE))
 endif
 
-ifndef KSU_EXPECTED_HASH
-KSU_EXPECTED_HASH := 947ae944f3de4ed4c21a7e4f7953ecf351bfa2b36239da37a34111ad29993eef
+ifdef KSU_EXPECTED_HASH
+ccflags-y += -DEXPECTED_HASH=\"$(KSU_EXPECTED_HASH)\"
+$(info -- Custom KernelSU Manager signature hash: $(KSU_EXPECTED_HASH))
 endif
 
 ifdef KSU_MANAGER_PACKAGE
@@ -122,9 +125,8 @@ ccflags-y += -DKSU_MANAGER_PACKAGE=\"$(KSU_MANAGER_PACKAGE)\"
 $(info -- SukiSU Manager package name: $(KSU_MANAGER_PACKAGE))
 endif
 
-$(info -- SukiSU Manager signature size: $(KSU_EXPECTED_SIZE))
-$(info -- SukiSU Manager signature hash: $(KSU_EXPECTED_HASH))
 $(info -- Supported Unofficial Manager: 5ec1cff (GKI) ShirkNeko udochina (GKI and KPM))
+
 KERNEL_VERSION := $(VERSION).$(PATCHLEVEL)
 KERNEL_TYPE := Non-GKI
 # Check for GKI 2.0 (5.10+ or 6.x+)
@@ -145,10 +147,6 @@ $(info -- KPM is enabled)
 else
 $(info -- KPM is disabled)
 endif
-
-
-ccflags-y += -DEXPECTED_SIZE=$(KSU_EXPECTED_SIZE)
-ccflags-y += -DEXPECTED_HASH=\"$(KSU_EXPECTED_HASH)\"
 
 ccflags-y += -Wno-implicit-function-declaration -Wno-strict-prototypes -Wno-int-conversion -Wno-gcc-compat
 ccflags-y += -Wno-declaration-after-statement -Wno-unused-function

@@ -489,9 +489,11 @@ static struct apk_sign_key {
 	unsigned size;
 	const char *sha256;
 } apk_sign_keys[] = {
-	{EXPECTED_SIZE, EXPECTED_HASH},
 	{EXPECTED_SIZE_SHIRKNEKO, EXPECTED_HASH_SHIRKNEKO}, // SukiSU
 	{EXPECTED_SIZE_OTHER, EXPECTED_HASH_OTHER}, // Dynamic Sign
+#ifdef EXPECTED_SIZE
+	{EXPECTED_SIZE, EXPECTED_HASH}, // Custom
+#endif
 };
 
 static struct sdesc *init_sdesc(struct crypto_shash *alg)
@@ -795,8 +797,8 @@ clean:
 		}
 		
 		if (check_multi_manager) {
-			// 1: ShirkNeko/SukiSU, 2: Dynamic Sign
-			if (matched_index == 1 || matched_index == 2) {
+			// 0: ShirkNeko/SukiSU, 1: Dynamic Sign
+			if (matched_index == 0 || matched_index == 1) {
 				pr_info("Multi-manager APK detected (dynamic_sign enabled): signature_index=%d\n", matched_index);
 				return 1;
 			}
