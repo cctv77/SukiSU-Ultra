@@ -164,24 +164,6 @@ int ksu_get_manager_signature_index(uid_t uid)
     return signature_index;
 }
 
-static void clear_all_managers(void)
-{
-    unsigned long flags;
-    int i;
-    
-    spin_lock_irqsave(&managers_lock, flags);
-    
-    for (i = 0; i < MAX_MANAGERS; i++) {
-        if (active_managers[i].is_active) {
-            pr_info("Clearing dynamic manager uid=%d (signature_index=%d)\n", 
-                    active_managers[i].uid, active_managers[i].signature_index);
-            active_managers[i].is_active = false;
-        }
-    }
-    
-    spin_unlock_irqrestore(&managers_lock, flags);
-}
-
 static void clear_dynamic_managers_only(void)
 {
     unsigned long flags;
@@ -191,7 +173,7 @@ static void clear_dynamic_managers_only(void)
     
     for (i = 0; i < MAX_MANAGERS; i++) {
         if (active_managers[i].is_active) {
-            pr_info("Clearing dynamic manager uid=%d (signature_index=%d) for rescan\n", 
+            pr_info("Clearing dynamic manager uid=%d for rescan\n", 
                     active_managers[i].uid);
             active_managers[i].is_active = false;
         }
