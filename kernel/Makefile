@@ -59,7 +59,7 @@ ifeq ($(KSU_GITHUB_VERSION),)
     $(info -- $(REPO_NAME) version (local .git): $(KSU_VERSION_FULL))
     $(info -- $(REPO_NAME) Formatted version (local .git): $(KSU_VERSION))
   else
-    KSU_VERSION_FULL := v$(KSU_VERSION_API)-$(REPO_NAME)-unknown@unknown
+    KSU_VERSION_FULL := v$(KSU_VERSION_API)-敲击岁月-unknown@unknown
     $(warning -- $(REPO_NAME) version: $(KSU_VERSION_FULL))
   endif
 else
