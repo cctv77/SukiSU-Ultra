@@ -83,7 +83,7 @@ ifeq ($(KSU_GITHUB_VERSION),)
     $(shell cd $(KSU_SRC); [ -f ../.git/shallow ] && $(GIT_BIN) fetch --unshallow)
     KSU_VERSION_FULL := $(call get_ksu_version_full,$(KSU_VERSION_API))
     $(info -- $(REPO_NAME) version (local .git): $(KSU_VERSION_FULL))
-    $(info -- $(REPO_NAME) Formatted version (local .git): $(KSU_VERSION))
+    $(info -- $(REPO_NAME) Formatted version (local .git): v$(KSU_VERSION_API)-$(KSU_VERSION)-Or so. 左右)
   else
     KSU_VERSION_FULL := v$(KSU_VERSION_API)-$(REPO_NAME)-unknown@unknown
     $(warning -- $(REPO_NAME) version: $(KSU_VERSION_FULL))
@@ -92,10 +92,12 @@ else
   $(shell cd $(KSU_SRC); [ -f ../.git/shallow ] && $(GIT_BIN) fetch --unshallow)
   KSU_VERSION_FULL := $(call get_ksu_version_full,$(KSU_GITHUB_VERSION))
   $(info -- $(REPO_NAME) version (Github): $(KSU_VERSION_FULL))
+  $(info -- $(REPO_NAME) Formatted version (Github): v$(KSU_GITHUB_VERSION)-$(KSU_VERSION)-Or so. 左右)
 endif
 
 ccflags-y += -DKSU_VERSION=$(KSU_VERSION)
 ccflags-y += -DKSU_VERSION_FULL=\"$(KSU_VERSION_FULL)\"
+ccflags-y += -DKSU_VERSION_FORMATTED=\"v$(KSU_GITHUB_VERSION)-$(KSU_VERSION)-Or so. 左右\"
 
 $(info -- Supported Unofficial Manager: 5ec1cff (GKI) rsuntk (Non-GKI) ShirkNeko udochina (GKI and non-GKI and KPM))
 
